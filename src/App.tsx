@@ -1,8 +1,20 @@
-import React from "react";
-import { Background, Controls, Edge, Node, ReactFlow } from "reactflow";
+import React, { useState } from "react";
+import {
+  addEdge,
+  applyEdgeChanges,
+  applyNodeChanges,
+  Background,
+  Connection,
+  Controls,
+  Edge,
+  EdgeChange,
+  Node,
+  NodeChange,
+  ReactFlow,
+} from "reactflow";
 import "reactflow/dist/style.css";
 
-const nodes: Node[] = [
+const initialNodes: Node[] = [
   {
     id: "1",
     data: { label: "Node 1" },
@@ -15,7 +27,7 @@ const nodes: Node[] = [
   },
 ];
 
-const edges: Edge[] = [
+const initialEdges: Edge[] = [
   {
     id: "1-2",
     source: "1",
@@ -26,6 +38,19 @@ const edges: Edge[] = [
 ];
 
 function App() {
+  const [nodes, setNodes] = useState<Node[]>(initialNodes);
+  const [edges, setEdges] = useState<Edge[]>(initialEdges);
+
+  const onNodesChange = (changes: NodeChange[]) => {
+    setNodes((nds) => applyNodeChanges(changes, nds));
+  };
+  const onEdgesChange = (changes: EdgeChange[]) => {
+    setEdges((eds) => applyEdgeChanges(changes, eds));
+  };
+  const onConnect = (connection: Connection) => {
+    setEdges((eds) => addEdge(connection, eds));
+  };
+
   return (
     <div style={{ height: "100vh" }}>
       <ReactFlow
@@ -33,6 +58,12 @@ function App() {
         nodes={nodes}
         // フローエディタにあるノード間をつなぐ線を渡す
         edges={edges}
+        // ノードを選択したりドラッグしたりすると呼ばれるコールバック関数を渡す
+        onNodesChange={onNodesChange}
+        // ノード間の線を変更しようとすると呼ばれるコールバック関数を渡す
+        onEdgesChange={onEdgesChange}
+        // ノード間の線を追加しようとすると呼ばれるコールバック関数を渡す
+        onConnect={onConnect}
       >
         {/* フローエディターのドット方眼背景を表示するコンポーネント */}
         <Background />
